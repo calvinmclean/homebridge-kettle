@@ -21,7 +21,7 @@ class StaggEKGAccessory {
         this.maxTemp = 100;
         this.minTemp = 40;
 
-        this.currentTemperature = 40;
+        // this.currentTemperature = 40;
         this.targetTemperature = 100;
         this.targetHeatingCoolingState = 0;
     }
@@ -49,11 +49,27 @@ class StaggEKGAccessory {
             .setProps({minValue: 40})
 
         this.service.getCharacteristic(Characteristic.CurrentTemperature)
+            .setProps({unit: 1})
+        this.service.getCharacteristic(Characteristic.CurrentTemperature)
+            .setProps({maxValue: 100})
+        this.service.getCharacteristic(Characteristic.CurrentTemperature)
+            .setProps({minValue: 0})
+
+        this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
+            .setProps({value: 1})
+
+        this.service.getCharacteristic(Characteristic.CurrentTemperature)
             .on('get', this.getCurrentTemperatureHandler.bind(this))
 
-        // this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
-        //     .on('get', this.getTemperatureDisplayUnitsHandler.bind(this))
-        //     .on('set', this.setTemperatureDisplayUnitsHandler.bind(this))
+        this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
+            .on('get', this.getTemperatureDisplayUnitsHandler.bind(this))
+            .on('set', this.setTemperatureDisplayUnitsHandler.bind(this))
+
+        this.service.getCharacteristic(Characteristic.TargetHeatingCoolingState)
+            .setProps({validValues: [0, 1]})
+
+        this.service.getCharacteristic(Characteristic.CurrentHeatingCoolingState)
+            .setProps({validValues: [0, 1]})
 
         return [informationService, this.service]
     }
@@ -108,25 +124,24 @@ class StaggEKGAccessory {
 
     getCurrentTemperatureHandler (callback) {
         this.log(`calling getCurrentTemperatureHandler`, this.currentTemperature)
+	var self = this;
         request({
             url: "http://localhost:8000/current_temp",
             method: "GET"
         }, function (error, response, body) {
-            this.currentTemperature = body
+	    self.currentTemperature = (body - 32)/1.8000
         });
-        callback(null, this.currentTemperature)
+        callback(null, self.currentTemperature)
     }
 
-    // getTemperatureDisplayUnitsHandler (callback) {
-    //     this.log(`calling getTemperatureDisplayUnitsHandler`, this.tempDisplayUnits)
-    //     callback(null, this.tempDisplayUnits)
-    // }
-    //
-    // setTemperatureDisplayUnitsHandler (value, callback) {
-    //     this.tempDisplayUnits = value
-    //     this.log(`calling setTemperatureDisplayUnitsHandler`, value)
-    //     callback(null)
-    // }
-}
+    getTemperatureDisplayUnitsHandler (callback) {
+        this.log(`calling getTemperatureDisplayUnitsHandler`, this.tempDisplayUnits)
+        callback(null, this.tempDisplayUnits)
+    }
 
-// Accessory [Homebridge] Setting Characteristic "Target Heating Cooling State" to value 3
+    setTemperatureDisplayUnitsHandler (value, callback) {
+        // this.tempDisplayUnits = value
+        this.log(`calling setTemperatureDisplayUnitsHandler`, value)
+        callback(null, this.tempDisplayUnits)
+    }
+}
