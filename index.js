@@ -42,18 +42,18 @@ class StaggEKGAccessory {
             .on('set', this.setTargetTemperatureHandler.bind(this))
 
         this.service.getCharacteristic(Characteristic.TargetTemperature)
-            .setProps({unit: 1})
-        this.service.getCharacteristic(Characteristic.TargetTemperature)
-            .setProps({maxValue: 100})
-        this.service.getCharacteristic(Characteristic.TargetTemperature)
-            .setProps({minValue: 40})
+            .setProps({
+                maxValue: 100,
+                minValue: 40,
+                unit: 1
+            })
 
         this.service.getCharacteristic(Characteristic.CurrentTemperature)
-            .setProps({unit: 1})
-        this.service.getCharacteristic(Characteristic.CurrentTemperature)
-            .setProps({maxValue: 100})
-        this.service.getCharacteristic(Characteristic.CurrentTemperature)
-            .setProps({minValue: 0})
+            .setProps({
+                maxValue: 100,
+                minValue: 0,
+                unit: 1
+            })
 
         this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
             .setProps({value: 1})
@@ -124,12 +124,12 @@ class StaggEKGAccessory {
 
     getCurrentTemperatureHandler (callback) {
         this.log(`calling getCurrentTemperatureHandler`, this.currentTemperature)
-	var self = this;
+	    var self = this;
         request({
             url: "http://localhost:8000/current_temp",
             method: "GET"
         }, function (error, response, body) {
-	    self.currentTemperature = (body - 32)/1.8000
+	        self.currentTemperature = (body - 32)/1.8000
         });
         callback(null, self.currentTemperature)
     }
