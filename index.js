@@ -20,10 +20,6 @@ class StaggEKGAccessory {
 
         this.maxTemp = 100;
         this.minTemp = 40;
-
-        // this.currentTemperature = 40;
-        this.targetTemperature = 100;
-        this.targetHeatingCoolingState = 0;
     }
 
     getServices () {
@@ -75,15 +71,16 @@ class StaggEKGAccessory {
     }
 
     getTargetHeatingCoolingStateCharacteristicHandler (callback) {
-        this.log(`calling getTargetHeatingCoolingStateCharacteristicHandler`, this.service.getCharacteristic(Characteristic.TargetHeatingCoolingState))
+        this.log(`calling getTargetHeatingCoolingStateCharacteristicHandler`)
         var self = this;
         request({
             url: "http://localhost:8000/state",
             method: "GET"
         }, function (error, response, body) {
+            self.log(`getTargetHeatingCoolingState result:`, body)
             self.service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, body)
         });
-        callback(null, this.service.getCharacteristic(Characteristic.TargetHeatingCoolingState))
+        callback(null, this.service.getCharacteristic(Characteristic.TargetHeatingCoolingState).value)
     }
 
     setTargetHeatingCoolingStateCharacteristicHandler (value, callback) {
@@ -100,15 +97,16 @@ class StaggEKGAccessory {
     }
 
     getTargetTemperatureHandler (callback) {
-        this.log(`calling getTargetTemperatureHandler`, this.service.getCharacteristic(Characteristic.TargetTemperature))
+        this.log(`calling getTargetTemperatureHandler`)
         var self = this;
         request({
             url: "http://localhost:8000/target_temp",
             method: "GET"
         }, function (error, response, body) {
-            self.service.updateCharacteristic(Characteristic.TargetTemperature, body)
+            self.log(`getTargetTemperatureHandler result:`, body)
+            self.service.updateCharacteristic(Characteristic.TargetTemperature, (body - 32)/1.8000)
         });
-        callback(null, this.service.getCharacteristic(Characteristic.TargetTemperature))
+        callback(null, this.service.getCharacteristic(Characteristic.TargetTemperature).value)
     }
 
     setTargetTemperatureHandler (value, callback) {
@@ -125,15 +123,16 @@ class StaggEKGAccessory {
     }
 
     getCurrentTemperatureHandler (callback) {
-        this.log(`calling getCurrentTemperatureHandler`, this.service.getCharacteristic(Characteristic.CurrentTemperature))
+        this.log(`calling getCurrentTemperatureHandler`)
         var self = this;
         request({
             url: "http://localhost:8000/current_temp",
             method: "GET"
         }, function (error, response, body) {
+            self.log(`getCurrentTemperatureHandler result:`, body)
             self.service.updateCharacteristic(Characteristic.CurrentTemperature, (body - 32)/1.8000)
         });
-        callback(null, this.service.getCharacteristic(Characteristic.CurrentTemperature))
+        callback(null, this.service.getCharacteristic(Characteristic.CurrentTemperature).value)
     }
 
     getTemperatureDisplayUnitsHandler (callback) {
