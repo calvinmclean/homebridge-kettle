@@ -16,6 +16,7 @@ class StaggEKGAccessory {
         this.log = log;
         this.config = config;
         this.service = new Service.Thermostat(this.config.name);
+        this.url = this.config.url;
         this.tempDisplayUnits = 1;
 
         this.maxTemp = 100;
@@ -74,7 +75,7 @@ class StaggEKGAccessory {
         this.log(`calling getTargetHeatingCoolingStateCharacteristicHandler`)
         var self = this;
         request({
-            url: "http://localhost:8000/state",
+            url: self.url + "/state",
             method: "GET"
         }, function (error, response, body) {
             self.log(`getTargetHeatingCoolingState result:`, body)
@@ -86,8 +87,9 @@ class StaggEKGAccessory {
     setTargetHeatingCoolingStateCharacteristicHandler (value, callback) {
         this.service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, value)
         this.log(`calling setTargetHeatingCoolingStateCharacteristicHandler`, value)
+        var self = this;
         request({
-            url: "http://localhost:8000/state",
+            url: self.url + "/state",
             method: "POST",
             json: false,
             body: "value=" + value,
@@ -100,7 +102,7 @@ class StaggEKGAccessory {
         this.log(`calling getTargetTemperatureHandler`)
         var self = this;
         request({
-            url: "http://localhost:8000/target_temp",
+            url: self.url + "/target_temp",
             method: "GET"
         }, function (error, response, body) {
             self.log(`getTargetTemperatureHandler result:`, body)
@@ -112,8 +114,9 @@ class StaggEKGAccessory {
     setTargetTemperatureHandler (value, callback) {
         this.service.updateCharacteristic(Characteristic.TargetTemperature, value)
         this.log(`calling setTargetTemperatureHandler`, value)
+        var self = this;
         request({
-            url: "http://localhost:8000/target_temp",
+            url: self.url + "/target_temp",
             method: "POST",
             json: false,
             body: "value=" + value.toString(),
@@ -126,7 +129,7 @@ class StaggEKGAccessory {
         this.log(`calling getCurrentTemperatureHandler`)
         var self = this;
         request({
-            url: "http://localhost:8000/current_temp",
+            url: self.url + "/current_temp",
             method: "GET"
         }, function (error, response, body) {
             self.log(`getCurrentTemperatureHandler result:`, body)
